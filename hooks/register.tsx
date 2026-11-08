@@ -52,8 +52,8 @@ function hostOf(url: string): string {
 }
 
 function isLocalHost(url: string): boolean {
-  const h = hostOf(url)
-  return h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h === '[::1]' || h.endsWith('.localhost')
+  const host = hostOf(url)
+  return host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || host === '[::1]' || host.endsWith('.localhost')
 }
 
 function replaceHost(url: string, host: string): string {

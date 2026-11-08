@@ -1,0 +1,5 @@
+{
+  "name": "phone-open-qr",
+  "owner": { "name": "Hans Kim" },
+  "plugins": [{ "name": "phone-open-qr", "source": "./" }]
+}

@@ -48,6 +48,15 @@ Claude에게 "폰에서 열어 볼게" 라고만 해도 됩니다. Claude가 `sh
 - QR이 작게 보이면 창을 넓히거나 폰을 조금 더 가까이 대세요.
 - `192.168…` 주소가 안 열리면 폰과 컴퓨터가 같은 Wi-Fi인지, 개발 서버가 외부 접속을 허용하는지(`--host 0.0.0.0` 등) 확인하세요.
 
+## 무엇을 실행하고, 무엇을 보내나 (What it runs and sends)
+
+- 이 플러그인은 **아무 데이터도 외부로 보내지 않습니다.** 네트워크 요청이 없고, 주소를 기록하거나 수집하지 않습니다.
+- QR 코드는 이 저장소 안의 코드(`hooks/qr.ts`)로 컴퓨터 안에서 만듭니다. 외부 QR 서비스를 쓰지 않습니다.
+- `localhost` 주소를 받았을 때만, 이 컴퓨터의 Wi-Fi 주소를 알아내려고 `ipconfig`(Windows), `ipconfig getifaddr en0`(macOS), `hostname -I`(Linux) 중 하나를 실행합니다. 결과에서 사설 IP 하나만 읽고 버립니다.
+- 보관하는 것은 마지막 QR 20개의 주소뿐이며, Claude Code 세션 상태 안에만 있습니다.
+
+This plugin sends nothing anywhere: no network requests, no logging of URLs. QR codes are generated locally by the code in this repository (`hooks/qr.ts`). Only for a `localhost` URL it runs one of `ipconfig` (Windows), `ipconfig getifaddr en0` (macOS) or `hostname -I` (Linux) to find this computer's private Wi-Fi address. The last 20 URLs are kept in Claude Code session state only.
+
 ## 라이선스
 
 MIT. QR 인코더는 외부 라이브러리 없이 이 저장소 안에 들어 있습니다.

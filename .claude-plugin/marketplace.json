@@ -1,5 +1,6 @@
 {
   "name": "phone-open-qr",
+  "description": "폰에서 바로 여는 QR — show a URL as a QR code beside the Claude Code conversation so you can open it on your phone.",
   "owner": { "name": "Hans Kim" },
   "plugins": [{ "name": "phone-open-qr", "source": "./" }]
 }

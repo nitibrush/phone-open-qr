@@ -1,6 +1,6 @@
 {
   "name": "phone-open-qr",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "폰에서 바로 여는 QR — While coding with Claude Code, open any URL on your phone instantly. A QR code is drawn right in the conversation.",
   "author": { "name": "Hans Kim" },
   "license": "MIT",

@@ -173,9 +173,9 @@ export const register: Register = (on) => {
     const note = typeof args.note === 'string' ? args.note : undefined
     const shown = await show($, raw, note)
     if ('error' in shown) return { deny: shown.error }
-    return {
-      result: { content: [{ type: 'text', text: describe(shown) }], isError: false },
-    }
+    // A registered tool answers with plain text (or an array of content blocks),
+    // not an MCP `{ content, isError }` envelope: the engine refuses that shape.
+    return { result: describe(shown) }
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {

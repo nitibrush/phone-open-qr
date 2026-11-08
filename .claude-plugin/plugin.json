@@ -7,5 +7,9 @@
   },
   "license": "MIT",
   "types": "./types/index.d.ts",
-  "icon": "./.claude-plugin/icon.png"
+  "icon": "./.claude-plugin/icon.png",
+  "homepage": "https://github.com/nitibrush/phone-open-qr",
+  "repository": "https://github.com/nitibrush/phone-open-qr",
+  "documentationUrl": "https://github.com/nitibrush/phone-open-qr#readme",
+  "supportUrl": "https://github.com/nitibrush/phone-open-qr/issues"
 }

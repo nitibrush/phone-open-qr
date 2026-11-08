@@ -52,10 +52,21 @@ Claude에게 "폰에서 열어 볼게" 라고만 해도 됩니다. Claude가 `sh
 
 - 이 플러그인은 **아무 데이터도 외부로 보내지 않습니다.** 네트워크 요청이 없고, 주소를 기록하거나 수집하지 않습니다.
 - QR 코드는 이 저장소 안의 코드(`hooks/qr.ts`)로 컴퓨터 안에서 만듭니다. 외부 QR 서비스를 쓰지 않습니다.
-- `localhost` 주소를 받았을 때만, 이 컴퓨터의 Wi-Fi 주소를 알아내려고 `ipconfig`(Windows), `ipconfig getifaddr en0`(macOS), `hostname -I`(Linux) 중 하나를 실행합니다. 결과에서 사설 IP 하나만 읽고 버립니다.
+- `localhost` 주소를 받았을 때만, 이 컴퓨터의 Wi-Fi 주소를 알아내려고 `ipconfig`(Windows), `ipconfig getifaddr en0`(macOS), `hostname -I`(Linux) 를 이 순서로 실행하고, 첫 번째로 나온 사설 IP 하나만 읽습니다. 다른 프로그램은 실행하지 않습니다.
 - 보관하는 것은 마지막 QR 20개의 주소뿐이며, Claude Code 세션 상태 안에만 있습니다.
 
-This plugin sends nothing anywhere: no network requests, no logging of URLs. QR codes are generated locally by the code in this repository (`hooks/qr.ts`). Only for a `localhost` URL it runs one of `ipconfig` (Windows), `ipconfig getifaddr en0` (macOS) or `hostname -I` (Linux) to find this computer's private Wi-Fi address. The last 20 URLs are kept in Claude Code session state only.
+This plugin sends nothing anywhere: no network requests, no logging of URLs. QR codes are generated locally by the code in this repository (`hooks/qr.ts`). Only for a `localhost` URL it runs, in this order, `ipconfig` (Windows), `ipconfig getifaddr en0` (macOS) and `hostname -I` (Linux), and reads one private IP address from the output. It runs no other programs. The last 20 URLs are kept in Claude Code session state only.
+
+## 코드가 하는 일, 항목별로 (What the code does, hook by hook)
+
+The mod is one hooks module, `hooks/register.tsx`, plus the QR encoder `hooks/qr.ts` it imports (a plain TypeScript helper with no side effects). Every call it makes is on the Claude Code engine interface `$`; nothing comes from another plugin.
+
+- **session.start** — registers the slash command `/phone-open-qr` and the tool `show_qr`. Nothing else.
+- **prompt.compose** — appends one short paragraph to the system prompt (session scope). It tells Claude: when you ask the user to open a URL on their phone, call `show_qr` with that URL and do not describe the QR yourself. It removes or changes nothing else, and reads the other sections only to pass them through unchanged.
+- **command.run** (`/phone-open-qr`) — answers the command itself: normalizes the URL, finds the Wi-Fi address for a `localhost` URL (see above), stores the row and draws it. With no argument it repeats the last QR.
+- **tool.call** (`mcp__phone-open-qr__show_qr`) — answers **the mod's own tool** with text describing what was drawn. It does not stand in for any other tool and matches only its own tool name.
+- **ui.render** (Pane, Placed) — draws the QR row: caption, QR image (SVG on desktop, half-block text in a terminal), the link, and an optional note.
+- **Engine calls used:** `$.command.register`, `$.tool.register`, `$.process.run` (the three commands above only), `$.clock.now`, `$.state` (via the atoms `rows`, `last`), `$.ui.place`, `$.ui.open`, `$.ui.resolve`. No `$.fs`, no `$.model`, no `$.agent`, no network.
 
 ## 라이선스
 

@@ -63,17 +63,47 @@ function replaceHost(url: string, host: string): string {
 const PRIVATE_IPV4 =
   /\b(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b/
 
+function privateIpIn(stdout: string): string | null {
+  const m = stdout.match(PRIVATE_IPV4)
+  return m?.[1] ?? null
+}
+
+/**
+ * Finds this computer's private Wi-Fi/LAN address so a localhost URL can be
+ * opened from a phone. It runs, in order, exactly these three commands, each
+ * written out in full, and stops at the first that prints a private address.
+ * Nothing is sent anywhere; only one address is read from the output.
+ */
 async function lanAddress($: Engine): Promise<string | null> {
-  const attempts: string[][] = [['ipconfig'], ['ipconfig', 'getifaddr', 'en0'], ['hostname', '-I']]
-  for (const argv of attempts) {
-    try {
-      const { exitCode, stdout } = await $.process.run(argv, { timeoutMs: 5000 })
-      if (exitCode !== 0) continue
-      const m = stdout.match(PRIVATE_IPV4)
-      if (m?.[1]) return m[1]
-    } catch {
-      // try the next command
+  try {
+    // Windows
+    const r = await $.process.run(['ipconfig'], { timeoutMs: 5000 })
+    if (r.exitCode === 0) {
+      const ip = privateIpIn(r.stdout)
+      if (ip) return ip
     }
+  } catch {
+    // not available on this platform; try the next
+  }
+  try {
+    // macOS
+    const r = await $.process.run(['ipconfig', 'getifaddr', 'en0'], { timeoutMs: 5000 })
+    if (r.exitCode === 0) {
+      const ip = privateIpIn(r.stdout)
+      if (ip) return ip
+    }
+  } catch {
+    // not available on this platform; try the next
+  }
+  try {
+    // Linux
+    const r = await $.process.run(['hostname', '-I'], { timeoutMs: 5000 })
+    if (r.exitCode === 0) {
+      const ip = privateIpIn(r.stdout)
+      if (ip) return ip
+    }
+  } catch {
+    // not available on this platform
   }
   return null
 }
